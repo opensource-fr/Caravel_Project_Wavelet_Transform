@@ -1,13 +1,10 @@
 import cocotb
 from cocotb.clock import Clock
 from cocotb.triggers import RisingEdge, FallingEdge, ClockCycles, with_timeout
-from test_wavelet_transform import Encoder
 import math
 import random
 import wave
 import struct
-
-clocks_per_phase = 10
 
 # takes ~60 seconds on my PC
 
@@ -16,7 +13,6 @@ async def test_start(dut):
     clock = Clock(dut.clk, 25, units="ns")
     cocotb.fork(clock.start())
 
-    # TODO: chip level reset goes to wishbone wb_rst_i
     dut.RSTB.value = 0
     dut.power1.value = 0;
     dut.power2.value = 0;
@@ -36,20 +32,15 @@ async def test_start(dut):
     dut.RSTB.value = 1
 
     # wait for the project to become active
-    # QUESTION: do I trigger the following test with this? (to make sure the project is online?)
-    # QUESTION: what to rename wrapped_rgb_mixer_3 for wavelet_transform?
-    # ANSWER: explore the trace, and get the vcd (will produce even if crashes), this will give the "path"
-    # ANSWER: better to write test benches without this, b/c gate level sim
-    # ANSWER: better to set io pin high when design is on, replace with below.
-    # TODO: replace this with new gpio pin from module, call it "active" path with vcd trace under mprj
     # in the testbench use a utility wire
-    await with_timeout(RisingEdge(dut.active), 500, 'us')
+    await with_timeout(RisingEdge(dut.o_active), 700, 'us')
 
 
 @cocotb.test()
-async def test_cwt(dut):
+async def test_wavelet(dut):
     clock = Clock(dut.clk, 25, units="ns")
     cocotb.fork(clock.start())
+
 
     # TODO: Assert proper starting values for wavelet_transform
     # # e.g. these should all be low at start
@@ -60,28 +51,45 @@ async def test_cwt(dut):
     # open audio files for read and write
     # audio_in = wave.open("./test/middle_c.wav")
     # QUESTION: what path should these wavs be in? (relative to which directory? makefile dir?)
-    audio_in = wave.open("./wavs/hello.wav")
-    audio_out = wave.open("./wavs/out.wav", "wb")
-    audio_out.setnchannels(audio_in.getnchannels())
-    audio_out.setsampwidth(audio_in.getnchannels())
-    audio_out.setframerate(audio_in.getframerate())
+    # relative to makefile
 
-    nframes = audio_in.getnframes()
-    print("sending %d frames" % nframes)
+    # undo this comment out to use audio
+    # audio_in = wave.open("./wavs/hello.wav")
+    # audio_out = wave.open("./wavs/out.wav", "wb")
+    # audio_out.setnchannels(audio_in.getnchannels())
+    # audio_out.setsampwidth(audio_in.getnchannels())
+    # audio_out.setframerate(audio_in.getframerate())
+
+    # nframes = audio_in.getnframes()
+    # print("sending %d frames" % nframes)
 
     dut.i_data_clk.value = 0
     counter = 0
+    dut.i_select_output_channel.value = 0 % 8
+    channel_select = 0
+    channel_select_counter = 200
 
     # process audio through dut
-    for i in range(nframes):
+    # for i in range(nframes):
+    for i in range(5000):
         await RisingEdge(dut.clk)
-        frame = audio_in.readframes(1)
+
+        # frame = audio_in.readframes(1)
         # print(frame)
-        (val,) = struct.unpack("h", frame)
+
+        # (val,) = struct.unpack("h", frame)
 
         dut.i_value.value = int(math.sin(0.1*counter*(1 + 0.01*counter))  * 127)
-        counter = 1 +counter
 
+        if channel_select_counter == 0:
+            channel_select += 1
+            dut.i_select_output_channel.value = channel_select % 8
+            channel_select_counter = 200
+        else:
+            channel_select_counter -= 1
+
+        dut.i_value.value = int(math.sin(0.1*counter*(1 + 0.01*counter))  * 127)
+        counter = 1 + counter
         # print(dut.i_value.value)
         # if val > 0:
         #     dut.i_value.value = min(int((val / 32768.0 * 127)), 127)

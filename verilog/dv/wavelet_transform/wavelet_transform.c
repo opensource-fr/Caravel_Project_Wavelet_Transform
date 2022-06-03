@@ -18,6 +18,7 @@
 #include <defs.h>
 #include <stub.c>
 
+#define PROJECT_ID 0
 
 /*
 	IO Test:
@@ -80,13 +81,11 @@ void main()
     reg_mprj_io_33 =  GPIO_MODE_USER_STD_OUTPUT;
 
     /* Apply configuration */
-    // QUESTION: what do these two lines do?
     reg_mprj_xfer = 1;
-    while (reg_mprj_xfer == 1);
+    while (reg_mprj_xfer == 1); // waits for io config to complete
 
-    // QUESTION: what do these two lines do?
-    reg_la0_oenb = 1;
-    reg_la0_iena = 0;
+    reg_la0_oenb = 1; // is an output
+    reg_la0_iena = 0; // not an input
 
     // reset
     reg_la0_data = 1;
