@@ -18,40 +18,89 @@
 `timescale 1 ns / 1 ps
 
 module wavelet_transform_tb;
-    initial begin
-        $dumpfile ("wavelet_transform.vcd");
-        $dumpvars (0, wavelet_transform_tb);
-        #1;
-    end
 
+    // BEGIN TB WIRE/REGISTER DECLARATION {{{
     reg clk;
-    // QUESTION: we ahve RSTB and rst, should I rename rst RSTB? or is this handled by .rst(la_data_in[0]) in the user_project_wrapper.v?
+    // QUESTION: we have RSTB and rst, should I rename rst RSTB? or is this handled by .rst(la_data_in[0]) in the user_project_wrapper.v?
     reg RSTB;
+    // QUESTION: do we need `reg CSB;`?
+    reg CSB;
 
     reg power1, power2;
     reg power3, power4;
 
-    // GL design loses the reset signal name, also doesn't keep la1_data_in
-    wire design_reset = uut.mprj.la_data_in[32];
-
     wire gpio;
     wire [37:0] mprj_io;
+    // END WIRE/REGISTER DECLARATION }}}
 
-    ///// convenience signals that match what the cocotb test modules are looking for
-    // QUESTION: do I need to change any of these for the cocotb.py test?
-    wire active = mprj_io[33];
-    // TODO: do this for the i_data_clk, etc. for cocotb readability
-    /* wire pwm1_out = mprj_io[15]; */
-    /* wire pwm2_out = mprj_io[16]; */
+    // BEGIN MODULE SPECIFIC WIRE DECLARATION {{{
+    wire i_data_clk;
+    wire i_value;
+    wire i_select_output_channel;
 
-    /* wire enc0_a, enc0_b, enc1_a, enc1_b, enc2_a, enc2_b; */
+    wire o_multiplexed_wavelet_out;
+    wire o_active;
 
+    // END MODULE SPECIFIC WIRE DECLARATION }}}
+
+    // QUESTION: CSB line needed?
+    assign mprj_io[3] = (CSB == 1'b1) ? 1'b1 : 1'bz;
+
+    // BEGIN INITIALIZATION SECTION {{{
+    always #12.5 clk <= (clk === 1'b0);
+
+    initial begin
+      clk = 0;
+    end
+
+    initial begin
+      RSTB <= 1'b0;
+      CSB  <= 1'b1;   // Force CSB high
+      #2000;
+      RSTB <= 1'b1;       // Release reset
+      #300000;
+      CSB = 1'b0;   // CSB can be released
+    end
+
+    initial begin   // Power-up sequence
+      power1 <= 1'b0;
+      power2 <= 1'b0;
+      power3 <= 1'b0;
+      power4 <= 1'b0;
+      #100;
+      power1 <= 1'b1;
+      #100;
+      power2 <= 1'b1;
+      #100;
+      power3 <= 1'b1;
+      #100;
+      power4 <= 1'b1;
+    end
+
+    initial begin
+      $dumpfile ("wavelet_transform.vcd");
+      $dumpvars (0, wavelet_transform_tb);
+      #1;
+      // repeat 25 cycles of 1000 clk edges for testbench
+      repeat (25) begin
+        repeat (100) @(posedge clk);
+        // $display("+1000 cycles");
+      end
+      $finish;
+    end
+    // END INITIALIZATION SECTION }}}
+
+    // BEGIN IN/OUT HUMAN READABLE ALIASES SECTION {{{
     // QUESTION: should these match inputs in user_project_wrapper?
+    // For inputs seems these are on the right
     assign mprj_io[8] = i_data_clk;
     assign mprj_io[16:9] = i_value;
-    assign mprj_io[32:25] = i_select_output_channel;
-    assign mprj_io[24:17] = o_multiplexed_wavelet_out;
-    /////
+    assign mprj_io[24:17] = i_select_output_channel;
+
+    // For outputs seems these are on the left
+    assign o_multiplexed_wavelet_out = mprj_io[32:25];
+    assign o_active = mprj_io[33];
+    // END IN/OUT HUMAN READABLE ALIASES SECTION }}}
 
     wire flash_csb;
     wire flash_clk;

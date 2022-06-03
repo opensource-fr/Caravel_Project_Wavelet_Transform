@@ -87,30 +87,18 @@ wavelet_transform wavelet_transform (
 	.vssd1(vssd1),	// User area 1 digital ground
 `endif
 
-    // TODO: create a reset setting
-    // TODO: add verible for formatting
     .clk(wb_clk_i),
-    // TODO: will need to write firmware to set the io's and set this as input and toggle
     .rst(la_data_in[0]),
 
-    // Logic Analyzer
-    .la_data_in(la_data_in),
-    .la_data_out(la_data_out),
-    .la_oenb (la_oenb),
-
-    // IO Pads
-    .io_in (io_in),
-    .io_out(io_out),
-    .io_oeb(io_oeb),
-
-    // Can only have so many pins, avoid 0-7
-    // NOTE: will aim to refactor the wavelet transform to output 1 byte at a time with a multiplexer for the byte to be output
+    // NOTE: Can only have so many pins, avoid io's 0-7
     .i_data_clk(io_in[8]),
     .i_value(io_in[16:9]),
     .i_select_output_channel(io_in[24:17]),
-    .o_multiplexed_wavelet_out(io_in[32:25]),
-    .o_active(io_in[33])
+    .o_multiplexed_wavelet_out(io_out[32:25]),
+    .o_active(io_out[33]),
 
+    // Output Enable
+    .io_oeb(io_oeb[33:25])
 );
 
 endmodule	// user_project_wrapper
