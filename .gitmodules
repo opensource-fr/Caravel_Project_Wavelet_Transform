@@ -1,3 +1,4 @@
 [submodule "verilog/rtl/wavelet_transform"]
 	path = verilog/rtl/wavelet_transform
 	url = https://github.com/opensource-fr/wavelet_transform.git
+  ignore = dirty
