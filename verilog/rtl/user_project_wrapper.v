@@ -81,41 +81,36 @@ module user_project_wrapper #(
 /*--------------------------------------*/
 /* User project is instantiated  here   */
 /*--------------------------------------*/
-
-user_proj_example mprj (
+wavelet_transform wavelet_transform (
 `ifdef USE_POWER_PINS
 	.vccd1(vccd1),	// User area 1 1.8V power
 	.vssd1(vssd1),	// User area 1 digital ground
 `endif
 
-    .wb_clk_i(wb_clk_i),
-    .wb_rst_i(wb_rst_i),
-
-    // MGMT SoC Wishbone Slave
-
-    .wbs_cyc_i(wbs_cyc_i),
-    .wbs_stb_i(wbs_stb_i),
-    .wbs_we_i(wbs_we_i),
-    .wbs_sel_i(wbs_sel_i),
-    .wbs_adr_i(wbs_adr_i),
-    .wbs_dat_i(wbs_dat_i),
-    .wbs_ack_o(wbs_ack_o),
-    .wbs_dat_o(wbs_dat_o),
+    // TODO: create a reset setting
+    // TODO: add verible for formatting
+    .clk(wb_clk_i),
+    // TODO: will need to write firmware to set the io's and set this as input and toggle
+    .rst(la_data_in[0]),
 
     // Logic Analyzer
-
     .la_data_in(la_data_in),
     .la_data_out(la_data_out),
     .la_oenb (la_oenb),
 
     // IO Pads
-
     .io_in (io_in),
     .io_out(io_out),
     .io_oeb(io_oeb),
 
-    // IRQ
-    .irq(user_irq)
+    // Can only have so many pins, avoid 0-7
+    // NOTE: will aim to refactor the wavelet transform to output 1 byte at a time with a multiplexer for the byte to be output
+    .i_data_clk(io_in[8]),
+    .i_value(io_in[16:9]),
+    .i_select_output_channel(io_in[24:17]),
+    .o_multiplexed_wavelet_out(io_in[32:25]),
+    .o_active(io_in[33])
+
 );
 
 endmodule	// user_project_wrapper
