@@ -114,7 +114,7 @@ async def test_modulated_sine(dut):
         await RisingEdge(dut.clk)
 
         # output should be zero if prior values are zero
-        assert dut.o_multiplexed_wavelet_out == 0
+        assert(dut.o_multiplexed_wavelet_out.value == 0)
 
         counter = 0
         channel_select = 0
@@ -141,9 +141,38 @@ async def test_modulated_sine(dut):
             # clk in data
             dut.i_data_clk.value = 1
 
+            # wait two clock cycles before reading output
+            # then test that the channel select is works correctly
+            await RisingEdge(dut.clk)
             await RisingEdge(dut.clk)
 
             dut.i_data_clk.value = 0
+
+            if (dut.i_select_output_channel.value == 0):
+                assert(dut.o_multiplexed_wavelet_out == dut.uut.mprj.wavelet_transform.fir_0.o_wavelet.value)
+                print(dut.o_multiplexed_wavelet_out, dut.uut.mprj.wavelet_transform.fir_0.o_wavelet.value)
+            if (dut.i_select_output_channel.value == 1):
+                assert(dut.o_multiplexed_wavelet_out == dut.uut.mprj.wavelet_transform.fir_1.o_wavelet.value)
+                print(dut.o_multiplexed_wavelet_out, dut.uut.mprj.wavelet_transform.fir_1.o_wavelet.value)
+            if (dut.i_select_output_channel.value == 2):
+                assert(dut.o_multiplexed_wavelet_out == dut.uut.mprj.wavelet_transform.fir_2.o_wavelet.value)
+                print(dut.o_multiplexed_wavelet_out, dut.uut.mprj.wavelet_transform.fir_2.o_wavelet.value)
+            if (dut.i_select_output_channel.value == 3):
+                assert(dut.o_multiplexed_wavelet_out == dut.uut.mprj.wavelet_transform.fir_3.o_wavelet.value)
+                print(dut.o_multiplexed_wavelet_out, dut.uut.mprj.wavelet_transform.fir_3.o_wavelet.value)
+            if (dut.i_select_output_channel.value == 4):
+                assert(dut.o_multiplexed_wavelet_out == dut.uut.mprj.wavelet_transform.fir_4.o_wavelet.value)
+                print(dut.o_multiplexed_wavelet_out, dut.uut.mprj.wavelet_transform.fir_4.o_wavelet.value)
+            if (dut.i_select_output_channel.value == 5):
+                assert(dut.o_multiplexed_wavelet_out == dut.uut.mprj.wavelet_transform.fir_5.o_wavelet.value)
+                print(dut.o_multiplexed_wavelet_out, dut.uut.mprj.wavelet_transform.fir_5.o_wavelet.value)
+            if (dut.i_select_output_channel.value == 6):
+                assert(dut.o_multiplexed_wavelet_out == dut.uut.mprj.wavelet_transform.fir_6.o_wavelet.value)
+                print(dut.o_multiplexed_wavelet_out, dut.uut.mprj.wavelet_transform.fir_6.o_wavelet.value)
+            if (dut.i_select_output_channel.value == 7):
+                assert(dut.o_multiplexed_wavelet_out == dut.uut.mprj.wavelet_transform.fir_7.o_wavelet.value)
+                print(dut.o_multiplexed_wavelet_out, dut.uut.mprj.wavelet_transform.fir_7.o_wavelet.value)
+
 
             await RisingEdge(dut.clk)
             await RisingEdge(dut.clk)
