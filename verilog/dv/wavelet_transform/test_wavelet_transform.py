@@ -162,8 +162,6 @@ async def test_modulated_sine(dut):
                 assert(dut.o_multiplexed_wavelet_out == dut.uut.mprj.wavelet_transform.fir_5.o_wavelet.value)
             if (dut.i_select_output_channel.value == 6):
                 assert(dut.o_multiplexed_wavelet_out == dut.uut.mprj.wavelet_transform.fir_6.o_wavelet.value)
-            if (dut.i_select_output_channel.value == 7):
-                assert(dut.o_multiplexed_wavelet_out == dut.uut.mprj.wavelet_transform.fir_7.o_wavelet.value)
 
 
             await RisingEdge(dut.clk)
