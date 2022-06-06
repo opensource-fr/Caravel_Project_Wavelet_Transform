@@ -81,24 +81,22 @@ module user_project_wrapper #(
 /*--------------------------------------*/
 /* User project is instantiated  here   */
 /*--------------------------------------*/
-wavelet_transform wavelet_transform (
-`ifdef USE_POWER_PINS
-	.vccd1(vccd1),	// User area 1 1.8V power
-	.vssd1(vssd1),	// User area 1 digital ground
-`endif
+wrapped_wavelet_transform wrapped_wavelet_transform (
+  `ifdef USE_POWER_PINS
+    .vccd1(vccd1),	// User area 1 1.8V power
+    .vssd1(vssd1),	// User area 1 digital ground
+  `endif
 
-    .clk(wb_clk_i),
-    .rst(la_data_in[0]),
+    .wb_clk_i(wb_clk_i),
 
-    // NOTE: Can only have so many pins, avoid io's 0-7
-    .i_data_clk(io_in[8]),
-    .i_value(io_in[16:9]),
-    .i_select_output_channel(io_in[24:17]),
-    .o_multiplexed_wavelet_out(io_out[32:25]),
-    .o_active(io_out[33]),
-
-    // Output Enable
-    .io_oeb(io_oeb[33:25])
+    .la1_data_in(la_data_in[63:32]),
+    .la1_data_out(la_data_out[63:32]),
+    .la1_oenb(la_oenb[63:32]),
+    .active(la_data_in[16]),
+    // TODO: add project_id from matt in above
+    .io_in(io_in),
+    .io_out(io_out),
+    .io_oeb(io_oeb)
 );
 
 endmodule	// user_project_wrapper

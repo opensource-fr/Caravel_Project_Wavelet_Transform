@@ -18,7 +18,8 @@
 #include <defs.h>
 #include <stub.c>
 
-#define PROJECT_ID 0
+// TODO: update with project id from matt
+#define PROJECT_ID 16
 
 /*
 	IO Test:
@@ -84,12 +85,15 @@ void main()
     reg_mprj_xfer = 1;
     while (reg_mprj_xfer == 1); // waits for io config to complete
 
-    reg_la0_oenb = 1; // is an output
-    reg_la0_iena = 0; // not an input
+    reg_la0_iena = 0; // input enable off
+    reg_la0_oenb = 0xffffffff; // enable logic analyser output (ignore the name, 1 is on, 0 off)
+    reg_la0_data |= (1 << PROJECT_ID); // enable the project
 
     // reset
-    reg_la0_data = 1;
-    reg_la0_data = 0;
+    reg_la1_oenb = 1; // is an output
+    reg_la1_iena = 0; // is not an input
+    reg_la1_data = 1;
+    reg_la1_data = 0;
 
     // no need for anything else as this design is free running.
 

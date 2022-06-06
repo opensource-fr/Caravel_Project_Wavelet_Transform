@@ -1,6 +1,7 @@
 # Caravel user project includes
 -v $(USER_PROJECT_VERILOG)/rtl/user_project_wrapper.v
--v $(USER_PROJECT_VERILOG)/rtl/wavelet_transform/src/wavelet_transform.v
--v $(USER_PROJECT_VERILOG)/rtl/wavelet_transform/src/fir.v
--v $(USER_PROJECT_VERILOG)/rtl/wavelet_transform/src/shift_register_line.v
--v $(USER_PROJECT_VERILOG)/rtl/wavelet_transform/src/output_multiplexer.v
+-v $(USER_PROJECT_VERILOG)/rtl/wrapped_wavelet_transform/wrapper.v
+-v $(USER_PROJECT_VERILOG)/rtl/wrapped_wavelet_transform/wavelet_transform/src/wavelet_transform.v
+-v $(USER_PROJECT_VERILOG)/rtl/wrapped_wavelet_transform/wavelet_transform/src/fir.v
+-v $(USER_PROJECT_VERILOG)/rtl/wrapped_wavelet_transform/wavelet_transform/src/shift_register_line.v
+-v $(USER_PROJECT_VERILOG)/rtl/wrapped_wavelet_transform/wavelet_transform/src/output_multiplexer.v
